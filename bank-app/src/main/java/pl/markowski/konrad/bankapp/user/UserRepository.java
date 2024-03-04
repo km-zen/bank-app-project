@@ -1,8 +1,7 @@
 package pl.markowski.konrad.bankapp.user;
 
-public interface UserRepository {
+import org.springframework.data.mongodb.repository.MongoRepository;
 
-    boolean authorize(String email, String password);
 
-    String showUserInformation();
+public interface UserRepository extends MongoRepository<User, Long> {
 }
