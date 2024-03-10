@@ -17,7 +17,7 @@ public class UserServiceImplDemo implements UserService {
     @Override
     public void create(User user) {
         int userId = idGenerator;
-        user.getAccounts().add(new Account(userId, BigDecimal.ZERO, Currency.PLN));
+        user.getAccounts().add(new Account("first account", userId, BigDecimal.ZERO, Currency.PLN));
         database.put(userId, user);
         idGenerator++;
     }

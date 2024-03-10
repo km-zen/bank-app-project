@@ -1,5 +1,6 @@
 package pl.markowski.konrad.bankapp.user;
 
+import jakarta.validation.Valid;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,38 +17,45 @@ public class UserController {
         this.userServiceImplDemo = userServiceImplDemo;
     }
 
-    @PostMapping("/new")
-    public String createUser(@RequestBody User user) {
+    @PostMapping
+    public ResponseEntity<CreatedUserResponseDto> createUser(@RequestBody @Valid CreatedUserRequestDto request ) {
+        User user = UserMapper.mapFromCreatedUserRequestDtoToUser(request);
         log.info("create new user");
         userServiceImplDemo.create(user);
-        return "redirect:/hello";
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<UserResponse> getUserById(@PathVariable Integer id) {
-        log.info("read user with id " + id);
-        User user = userServiceImplDemo.read(id);
-        UserResponse response = new UserResponse(user);
+        CreatedUserResponseDto response = UserMapper.mapFromUserToCreatedUserResponseDto(user);
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/all")
-    public Map<Integer, User> getAllUsers() {
+    @GetMapping("/{id}")
+    public ResponseEntity<GetUserResponseDto> getUserById(@PathVariable Integer id) {
+        log.info("read user with id " + id);
+        User user = userServiceImplDemo.read(id);
+        GetUserResponseDto response = UserMapper.mapFromUserToGetUserResponseDto(user);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping
+    public ResponseEntity<GetAllUsersResponseDto> getAllUsers() {
+        Map<Integer,User> allUsers = userServiceImplDemo.findAll();
         log.info("read all users");
-        return userServiceImplDemo.findAll();
+        GetAllUsersResponseDto response = UserMapper.mapFromAllUsersToGetAllUsersResponseDto(allUsers);
+        return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/update/{id}")
-    public String updateUser(@PathVariable Integer id, @RequestBody User user) {
-        log.info("update user with id" + id);
+    @PutMapping("/{id}")
+    public ResponseEntity<UpdateUserResponseDto>updateUser(@PathVariable Integer id, @RequestBody @Valid UpdateUserRequestDto request) {
+        User user = UserMapper.mapFromUpdateUserRequestDtoToUser(request);
         userServiceImplDemo.update(id, user);
-        return "redirect:/users/all";
+        log.info("update user with id" + id);
+        UpdateUserResponseDto response = UserMapper.mapFromUserToUpdatedUserResponseDto(user);
+        return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/delete/{id}")
-    public String deleteUserById(@PathVariable Integer id) {
+   @DeleteMapping("/{id}")
+    public ResponseEntity<DeleteUserResponseDto> deleteUserById(@PathVariable Integer id) {
         log.info("delete user with id" + id);
         userServiceImplDemo.delete(id);
-        return "redirect:/users/all";
+        DeleteUserResponseDto response = UserMapper.mapFromUserToDeleteUserResponseDto(id);
+        return ResponseEntity.ok(response);
     }
 }
